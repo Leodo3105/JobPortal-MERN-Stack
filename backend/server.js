@@ -5,6 +5,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 
 // ES6 way to get __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +14,9 @@ const __dirname = dirname(__filename);
 
 // Load env vars
 dotenv.config();
+
+// Connect to database
+connectDB();
 
 // Khởi tạo express app
 const app = express();
@@ -30,6 +35,9 @@ app.use(cors({
 
 // Set static folder
 app.use('/uploads', express.static(join(__dirname, 'uploads')));
+
+// Mount routers
+app.use('/api/auth', authRoutes);
 
 // Route tạm thời để kiểm tra server
 app.get('/', (req, res) => {
