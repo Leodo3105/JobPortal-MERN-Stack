@@ -62,6 +62,22 @@ const Navbar: React.FC = () => {
                 >
                   Dashboard
                 </Link>
+                {user?.role === 'user' && (
+                  <Link
+                    to="/profile"
+                    className="text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Hồ sơ của tôi
+                  </Link>
+                )}
+                {user?.role === 'employer' && (
+                  <Link
+                    to="/company-profile"
+                    className="text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Hồ sơ công ty
+                  </Link>
+                )}
               </div>
               <button
                 onClick={handleLogout}

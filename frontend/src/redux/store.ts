@@ -1,10 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
+import candidateProfileReducer from './slices/candidateProfileSlice';
+import employerProfileReducer from './slices/employerProfileSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    // Thêm reducers khác khi cần
+    candidateProfile: candidateProfileReducer,
+    employerProfile: employerProfileReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

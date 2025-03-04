@@ -29,6 +29,18 @@ const UserSchema = new mongoose.Schema({
     enum: ['user', 'employer', 'admin'],
     default: 'user'
   },
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: String,
+  verificationTokenExpire: Date,
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
+  avatar: {
+    type: String,
+    default: 'default-avatar.jpg'
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -54,6 +66,40 @@ UserSchema.methods.getSignedJwtToken = function() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
+};
+
+// Tạo token đặt lại mật khẩu
+UserSchema.methods.getResetPasswordToken = function() {
+  // Tạo token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token và lưu vào database
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Đặt thời gian hết hạn
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 phút
+
+  return resetToken;
+};
+
+// Tạo token xác thực email
+UserSchema.methods.getEmailVerificationToken = function() {
+  // Tạo token
+  const verificationToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token và lưu vào database
+  this.verificationToken = crypto
+    .createHash('sha256')
+    .update(verificationToken)
+    .digest('hex');
+
+  // Đặt thời gian hết hạn
+  this.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 giờ
+
+  return verificationToken;
 };
 
 export default mongoose.model('User', UserSchema);

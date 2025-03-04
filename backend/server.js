@@ -1,4 +1,3 @@
-// ES6 Imports
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -7,8 +6,9 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import candidateProfileRoutes from './routes/candidateProfileRoutes.js';
+import employerProfileRoutes from './routes/employerProfileRoutes.js';
 
-// ES6 way to get __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -38,6 +38,8 @@ app.use('/uploads', express.static(join(__dirname, 'uploads')));
 
 // Mount routers
 app.use('/api/auth', authRoutes);
+app.use('/api/candidate-profiles', candidateProfileRoutes);
+app.use('/api/employer-profiles', employerProfileRoutes);
 
 // Route tạm thời để kiểm tra server
 app.get('/', (req, res) => {
