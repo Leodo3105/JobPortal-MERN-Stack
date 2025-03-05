@@ -8,6 +8,8 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import candidateProfileRoutes from './routes/candidateProfileRoutes.js';
 import employerProfileRoutes from './routes/employerProfileRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import applicationRoutes from './routes/applicationRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -40,6 +42,8 @@ app.use('/uploads', express.static(join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/candidate-profiles', candidateProfileRoutes);
 app.use('/api/employer-profiles', employerProfileRoutes);
+app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
 // Route tạm thời để kiểm tra server
 app.get('/', (req, res) => {
