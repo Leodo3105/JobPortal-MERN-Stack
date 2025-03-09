@@ -10,6 +10,8 @@ import candidateProfileRoutes from './routes/candidateProfileRoutes.js';
 import employerProfileRoutes from './routes/employerProfileRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,6 +46,8 @@ app.use('/api/candidate-profiles', candidateProfileRoutes);
 app.use('/api/employer-profiles', employerProfileRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Route tạm thời để kiểm tra server
 app.get('/', (req, res) => {

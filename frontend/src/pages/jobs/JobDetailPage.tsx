@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
 import { getJobById } from '../../redux/slices/jobSlice';
 import { applyForJob } from '../../redux/slices/applicationSlice';
+import { checkWishlistItem, addToWishlist, removeFromWishlist } from '../../redux/slices/wishlistSlice';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 
@@ -14,6 +15,7 @@ const JobDetailPage: React.FC = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const { loading: applyLoading } = useAppSelector((state) => state.application);
   const { profile } = useAppSelector((state) => state.candidateProfile);
+  const { isInWishlist, loading: wishlistLoading } = useAppSelector((state) => state.wishlist);
   
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
@@ -23,6 +25,12 @@ const JobDetailPage: React.FC = () => {
       dispatch(getJobById(id));
     }
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (id && isAuthenticated && user?.role === 'user') {
+      dispatch(checkWishlistItem(id));
+    }
+  }, [dispatch, id, isAuthenticated, user]);
 
   const formatSalary = () => {
     if (!currentJob?.salary) return 'Thỏa thuận';
@@ -70,6 +78,29 @@ const JobDetailPage: React.FC = () => {
         }
       } catch (error) {
         toast.error('Đã có lỗi xảy ra khi ứng tuyển');
+      }
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để thêm vào danh sách yêu thích');
+      navigate('/login');
+      return;
+    }
+
+    if (user?.role !== 'user') {
+      toast.error('Chỉ ứng viên mới có thể thêm vào danh sách yêu thích');
+      return;
+    }
+
+    if (id) {
+      if (isInWishlist) {
+        dispatch(removeFromWishlist(id));
+        toast.success('Đã xóa khỏi danh sách yêu thích');
+      } else {
+        dispatch(addToWishlist(id));
+        toast.success('Đã thêm vào danh sách yêu thích');
       }
     }
   };
@@ -164,7 +195,7 @@ const JobDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-4 md:mt-0 flex flex-col items-start">
+          <div className="mt-4 md:mt-0 flex flex-col items-start space-y-2">
             <div className="bg-green-50 px-4 py-2 rounded-md mb-4">
               <span className="text-green-700 font-medium">Mức lương:</span>
               <p className="text-green-600 font-bold text-xl">{formatSalary()}</p>
@@ -172,11 +203,45 @@ const JobDetailPage: React.FC = () => {
 
             <button
               onClick={() => setShowApplyModal(true)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors w-full"
               disabled={user?.role === 'employer'}
             >
               Ứng tuyển ngay
             </button>
+
+            {user?.role === 'user' && (
+              <button
+                onClick={handleToggleWishlist}
+                disabled={wishlistLoading}
+                className={`flex items-center justify-center gap-2 px-6 py-2 rounded-md transition-colors w-full ${
+                  isInWishlist
+                    ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-300'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-300'
+                }`}
+              >
+                {wishlistLoading ? (
+                  <div className="w-5 h-5 border-t-2 border-b-2 border-current rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    {isInWishlist ? (
+                      <>
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"></path>
+                        </svg>
+                        <span>Bỏ yêu thích</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span>Yêu thích</span>
+                      </>
+                    )}
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

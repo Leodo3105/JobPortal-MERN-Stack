@@ -4,6 +4,7 @@ import candidateProfileReducer from './slices/candidateProfileSlice';
 import employerProfileReducer from './slices/employerProfileSlice';
 import jobReducer from './slices/jobSlice';
 import applicationReducer from './slices/applicationSlice';
+import wishlistReducer from './slices/wishlistSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     candidateProfile: candidateProfileReducer,
     employerProfile: employerProfileReducer,
     job: jobReducer,
-    application: applicationReducer
+    application: applicationReducer,
+    wishlist: wishlistReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
