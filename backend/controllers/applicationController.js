@@ -1,7 +1,9 @@
+// backend/controllers/applicationController.js
 import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import CandidateProfile from '../models/CandidateProfile.js';
 import { validationResult } from 'express-validator';
+import { sendNewApplicationEmail, sendApplicationStatusEmail } from '../services/emailService.js';
 
 // Nộp đơn ứng tuyển
 export const applyForJob = async (req, res) => {
@@ -44,6 +46,9 @@ export const applyForJob = async (req, res) => {
     });
 
     await application.save();
+    
+    // Gửi email thông báo cho nhà tuyển dụng
+    await sendNewApplicationEmail(application);
 
     // Cập nhật job với application ID
     await Job.findByIdAndUpdate(
@@ -143,9 +148,15 @@ export const updateApplicationStatus = async (req, res) => {
       return res.status(403).json({ msg: 'Không có quyền cập nhật đơn ứng tuyển này' });
     }
 
+    // Lưu trạng thái trước khi cập nhật
+    const previousStatus = application.status;
+    
     // Cập nhật trạng thái
     application.status = status;
     await application.save();
+    
+    // Gửi email thông báo cho ứng viên
+    await sendApplicationStatusEmail(application, previousStatus);
 
     res.json({
       success: true,
